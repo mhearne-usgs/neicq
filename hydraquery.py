@@ -169,7 +169,7 @@ def main():
             cursor.execute(query)
             db.commit()
         except cx_Oracle.DatabaseError, exc:
-            print 'Error executing query:\n%s\n' % query
+            print 'Error executing query:\n"%s"\n' % query
             error, = exc.args
             print "Oracle-Error-Code:", error.code
             print "Oracle-Error-Message:", error.message
