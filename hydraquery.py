@@ -30,6 +30,34 @@ def getPDERange(cursor,pdenumber):
         pdemax = row[1]
     return (pdemin,pdemax)
 
+def emptyTable(cursor,db):
+    cursor.execute('TRUNCATE table HDB_MONITOR.PDEHydra')
+    db.commit()
+    cursor.execute('SELECT count(idEvent) FROM HDB_MONITOR.PDEHydra')
+    nrows = cursor.fetchone()[0]
+    if nrows != 0:
+        return False
+    return True
+
+def insertBaseRecords(cursor,db,tstart,tend):
+    query = '''insert into HDB_MONITOR.PDEHydra(idEvent, OT, Lat, Lon, Depth, Mag, idBHPF, iPDENum)
+    (select bhp.idEvent, tOrigin, dLat, dLon, dDepth, dPrefMag, bhp.idBHPellet, get_pde_from_ot(tOrigin)
+    from all_bhpelletdescs bhp, 
+	(
+	select idevent, max(idbhpellet) idbhpellet from all_bhpelletdescs 
+	where iworkflowstatus >= 8192*65536
+	group by idevent
+	) mbhp
+    where bhp.idBHPellet = mbhp.idBHPellet
+    and bhp.tOrigin between %i and %i
+    )''' % (tstart,tend)
+    cursor.execute(query)
+    db.commit()
+    cursor.execute('SELECT count(idEvent) FROM HDB_MONITOR.PDEHydra')
+    nrows = cursor.fetchone()[0]
+    return nrows
+
+
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     lastfile = os.path.join(homedir,'lastprocessed.txt')
@@ -55,6 +83,13 @@ def main():
         print 'Most recent PDE is not newer than the most recently processed.  Exiting.'
         sys.exit(0)
     starttime,endtime = getPDERange(cursor,pdenumber)
+
+    res = emptyTable(cursor,db)
+    if not res:
+        print 'Could not empty the PDE table!'
+        sys.exit(1)
+    insertBaseRecords(cursor,db,starttime,endtime)
+    
     cursor.close()
     db.close()
 
