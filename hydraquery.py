@@ -46,6 +46,7 @@ def main():
     port = int(config.get('DATABASE','port'))
     user = config.get('DATABASE','user')
     password = config.get('DATABASE','password')
+    sid = config.get('DATABASE','sid')
     tns = cx_Oracle.makedsn(ip,port,sid)
     db = cx_Oracle.connect(user,passwd,tns)
     cursor = db.cursor()
