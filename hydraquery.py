@@ -28,7 +28,7 @@ def getQueries(homedir):
                 iscomment = True
             if isquery: #then we just finished a query
                 if len(thisquery.strip()):
-                    queries.append(thisquery.strip())
+                    queries.append(thisquery)
                 thisquery = ''
                 isquery = False
                 continue
@@ -39,9 +39,9 @@ def getQueries(homedir):
             continue
         if not iscomment:
             isquery = True
-            thisquery += ' ' + line.strip()
+            thisquery += ' ' + line
     if isquery:
-        queries.append(thisquery.strip()) #grab the last one, if not followed by comment block     
+        queries.append(thisquery) #grab the last one, if not followed by comment block     
     f.close()
     return queries
 
