@@ -34,10 +34,10 @@ def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     lastfile = os.path.join(homedir,'lastprocessed.txt')
     if not os.path.isfile(lastfile):
-        lastprocessed = '190001'
+        lastprocessed = 190001
     else:
         f = open(lastfile,'rt')
-        lastprocessed = f.readline().strip()
+        lastprocessed = int(f.readline().strip())
         f.close()
     configfile = os.path.join(homedir,'config.ini')
     config = ConfigParser.ConfigParser()
