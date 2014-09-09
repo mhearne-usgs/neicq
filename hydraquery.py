@@ -19,7 +19,7 @@ def getMostRecentPDE(cursor):
     return pdestr
 
 def getPDERange(cursor,pdenumber):
-    if debug:
+    if DEBUG:
         pdemin = 1397600000
         pdemax = 1397610000
     else:
