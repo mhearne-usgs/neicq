@@ -94,7 +94,7 @@ def main():
         sys.exit(1)
     nrows = insertBaseRecords(cursor,db,starttime,endtime)
     
-    print '%i events discovered between %s and %s' % (startdate,enddate)
+    print '%i events discovered between %s and %s' % (nrows,startdate,enddate)
     
     cursor.close()
     db.close()
