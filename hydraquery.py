@@ -7,7 +7,7 @@ import os.path
 import ConfigParser
 
 #third party imports
-import cx_Oracle
+#import cx_Oracle
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 DEBUG = True
@@ -28,7 +28,6 @@ def getQueries(homedir):
                 iscomment = True
             if isquery: #then we just finished a query
                 if len(thisquery.strip()):
-                    thisquery = thisquery.replace(';','')
                     queries.append(thisquery.strip())
                 thisquery = ''
                 isquery = False
@@ -42,7 +41,6 @@ def getQueries(homedir):
             isquery = True
             thisquery += ' ' + line.strip()
     if isquery:
-        thisquery = thisquery.replace(';','')
         queries.append(thisquery.strip()) #grab the last one, if not followed by comment block     
     f.close()
     return queries
@@ -183,6 +181,9 @@ def main():
 
 if __name__ == '__main__':
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    main()
+    querylist = getQueries(homedir)
+    for query in querylist:
+        print '%s\n' % query
+    #main()
     sys.exit(0)
     

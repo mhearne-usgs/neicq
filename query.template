@@ -1,7 +1,7 @@
 /******************************************************/
 /* 1b  Ensure it's empty */
 /******************************************************/
-TRUNCATE table HDB_MONITOR.PDEHydra;
+TRUNCATE table HDB_MONITOR.PDEHydra
 
 /******************************************************/
 /* 2  Insert base PDE Records, in the form: */
@@ -26,7 +26,7 @@ insert into HDB_MONITOR.PDEHydra(idEvent, OT, Lat, Lon, Depth, Mag, idBHPF, iPDE
 	) mbhp
  where bhp.idBHPellet = mbhp.idBHPellet
    and bhp.tOrigin between [STARTPDE] and [ENDPDE]
-);
+)
 
 /******************************************************/
 /* 4  Populate desired fields with additional info          */
@@ -46,7 +46,7 @@ set IDAOINITIAL =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4b  Initial Glass Detection (Origin) */
 update HDB_MONITOR.PDEHydra p
@@ -62,7 +62,7 @@ set IDAOGLASS =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4c  Initial External Detection (Origin) */
 update HDB_MONITOR.PDEHydra p
@@ -78,7 +78,7 @@ set IDAOEXT =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4d  Initial Mag Publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -88,7 +88,7 @@ set IDBHPINIT =
     where b.idevent = p.idevent
 	  and dprefmag >= 2.0
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4e  First passport entry */
 update HDB_MONITOR.PDEHydra p
@@ -97,7 +97,7 @@ set tInitPP =
     where ep.idevent = p.idevent
 	  and ep.idauthor != (select idauthor from ALL_AUTHOR_INFO where sname = 'Def_Passport')
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4f  Last Auto pellet publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -107,7 +107,7 @@ set IDBHPAUTO =
     where b.idevent = p.idevent
 	  and toutput < nvl(p.tinitpp, 9000000000)
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4g  Initial Quick Review publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -118,7 +118,7 @@ set IDBHPQR =
 	  and bitand(b.fpubstatus, 256) = 256 /* QR only */
 	  and b.toutput - b.torigin < 7200 /* limit QR to 2 hour window? */
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4h  Final publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -128,7 +128,7 @@ set IDBHPF =
     where b.idevent = p.idevent
 	  and b.fpubstatus >= 256
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4i  Initial ATWC Public (Origin) */
 update HDB_MONITOR.PDEHydra p
@@ -147,7 +147,7 @@ set IDAOATX =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4j  Initial ATWC Internal (Origin) */
 update HDB_MONITOR.PDEHydra p
@@ -166,7 +166,7 @@ set IDAOATI =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4k  Initial PTWC Public (Origin) */
 update HDB_MONITOR.PDEHydra p
@@ -185,7 +185,7 @@ set IDAOPTX =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4l  Initial PTWC Internal (Origin) */
 update HDB_MONITOR.PDEHydra p
@@ -204,7 +204,7 @@ set IDAOPTI =
     and AO1.sauthoreventid = AO2.sauthoreventid
 	and AO1.idAuthor = AO2.idAuthor
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4m  OT + 10 min pellet */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -214,7 +214,7 @@ set IDBHP10 =
     where b.idevent = p.idevent
 	  and toutput <= torigin + 615 /* 10 minutes - with some cushion */
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4n  In Shadow of larger event? idEvent */
 update HDB_MONITOR.PDEHydra p
@@ -226,14 +226,14 @@ set IDEVTSHADOW =
 		   )
 	   and p.idevent != r.idevent
 	)
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4o  idAOHInit - Hydra Origin for first pellet (assumes origins inserted in time order) */
 declare
   Temp_idAuthorHydra number;
 begin
 
-select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342;
+select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342
 
 update HDB_MONITOR.PDEHydra p
 set idAOHInit =
@@ -244,7 +244,7 @@ set idAOHInit =
 		and a.sauthoreventid = e.huidevent
 	    and a.tinserted < b.toutput
 	 )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 end;
 
@@ -253,7 +253,7 @@ declare
   Temp_idAuthorHydra number;
 begin
 
-select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342;
+select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342
 
 update HDB_MONITOR.PDEHydra p
 set idAOHAuto =
@@ -264,7 +264,7 @@ set idAOHAuto =
 		and a.sauthoreventid = e.huidevent
 	    and a.tinserted < b.toutput
 	 )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 end;
 
@@ -273,7 +273,7 @@ declare
   Temp_idAuthorHydra number;
 begin
 
-select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342;
+select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342
 
 update HDB_MONITOR.PDEHydra p
 set idAOHQR =
@@ -285,7 +285,7 @@ set idAOHQR =
 		and a.sauthoreventid = e.huidevent
 	    and a.tinserted < b.toutput
 	 )
-where idBHPQR IS NOT NULL;
+where idBHPQR IS NOT NULL
 
 end;
 
@@ -294,7 +294,7 @@ declare
   Temp_idAuthorHydra number;
 begin
 
-select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342;
+select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342
 
 update HDB_MONITOR.PDEHydra p
 set idAOHF =
@@ -305,7 +305,7 @@ set idAOHF =
 		and a.sauthoreventid = e.huidevent
 	    and a.tinserted < b.toutput
 	 )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 end;
 
@@ -314,7 +314,7 @@ declare
   Temp_idAuthorHydra number;
 begin
 
-select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342;
+select idAuthor into Temp_idAuthorHydra from ALL_Author_Info where sname = 'HYDRA' and itype = 342
 
 update HDB_MONITOR.PDEHydra p
 set idAOH10 =
@@ -325,7 +325,7 @@ set idAOH10 =
 		and a.sauthoreventid = e.huidevent
 	    and a.tinserted < b.toutput
 	 )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 end;
 
@@ -335,7 +335,7 @@ set idECInit =
 	(select min(idEventClaim) from ALL_EventClaim_Info e
 	 where idEvent = p.idEvent
 	)
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4u  Final EventClaim record  - assumes EventClaim records are inserted in time order */
 update HDB_MONITOR.PDEHydra p
@@ -343,7 +343,7 @@ set idECLast =
 	(select max(idEventClaim) from ALL_EventClaim_Info e
 	 where idEvent = p.idEvent
 	)
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4v  Initial MT-Only Review publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -361,7 +361,7 @@ set IDBHPMTOnly =
 	                             where idevent = p.idevent
 								   and spassportentry like '%MTOnly%')
   )
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4w  First Response Pellet  - assumes ALL_BHPelletDescs records are inserted in time order */
 update HDB_MONITOR.PDEHydra p
@@ -370,7 +370,7 @@ set idBHPResp =
 	 where idEvent = p.idEvent
 	   and dprefmag >= 5
 	)
-where idEvent IS NOT NULL;
+where idEvent IS NOT NULL
 
 /* 4x  Initial QuickReview publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -382,7 +382,7 @@ set IDEPQR =
 	  and b.toutput < ep.tpassentrycreated
 	  and ep.spassportcmd = 'BHOutputsStatus'
   )
-where idBHPQR IS NOT NULL;
+where idBHPQR IS NOT NULL
 
 /* 4y  Initial MT-Only Review publication */
 /* WARNING - THIS QUERY PRESUMES THAT PELLETS ARE LOADED IN TIME ORDER OF GENERATION.  THIS MAY NOT BE VALID */
@@ -398,7 +398,7 @@ set IDEPMTOnly =
 	                             where idevent = p.idevent
 								   and spassportentry like '%MTOnly%')
   )
-where idBHPMTOnly IS NOT NULL;
+where idBHPMTOnly IS NOT NULL
 
 /* 4z  Felt Report */
 update HDB_MONITOR.PDEHydra p
@@ -410,10 +410,10 @@ set FELT = 1
 	   and e.idComment = c.idcomment
 	   and c.scomment like '%Felt%'
   )
-and idEvent IS NOT NULL;
+and idEvent IS NOT NULL
 
 /* set all others to not felt */
 update HDB_MONITOR.PDEHydra p 
 set FELT = 0
-where FELT IS NULL and idEvent IS NOT NULL;
+where FELT IS NULL and idEvent IS NOT NULL
 
