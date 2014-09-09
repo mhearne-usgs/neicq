@@ -20,16 +20,22 @@ def getQueries(homedir):
     f = open(queryfile,'rt')
     queries = []
     isquery = False
+    iscomment = False
     thisquery = ''
     for line in f.readlines():
-        if line.strip().startswith('/*') or line.strip().endswith('*/'):
+        if line.strip().startswith('/*'):
+            iscomment = True
             if isquery: #then we just finished a query
                 queries.append(thisquery)
                 thisquery = ''
                 isquery = False
+                continue
             else:
                 continue
-        else:
+        if line.strip().endswith('*/') and not line.strip().startswith('/*'):
+            iscomment = False
+            continue
+        if not iscomment and not isquery:
             isquery = True
             thisquery += line.strip()
     if isquery:
