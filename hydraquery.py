@@ -7,7 +7,7 @@ import os.path
 import ConfigParser
 
 #third party imports
-#import cx_Oracle
+import cx_Oracle
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 DEBUG = True
@@ -181,9 +181,6 @@ def main():
 
 if __name__ == '__main__':
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    querylist = getQueries(homedir)
-    for query in querylist:
-        print '%s\n' % query
-    #main()
+    main()
     sys.exit(0)
     
