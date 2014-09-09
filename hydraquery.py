@@ -52,6 +52,7 @@ def insertBaseRecords(cursor,db,tstart,tend):
     and bhp.tOrigin between %i and %i
     )''' % (tstart,tend)
     query = query.replace('\n',' ')
+    query = query.replace('\t',' ')
     cursor.execute(query)
     db.commit()
     cursor.execute('SELECT count(idEvent) FROM HDB_MONITOR.PDEHydra')
