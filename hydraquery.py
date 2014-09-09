@@ -28,7 +28,7 @@ def getPDERange(cursor,pdenumber):
         row = cursor.fetchone()
         pdemin = row[0]
         pdemax = row[1]
-    return return (pdemin,pdemax)
+    return (pdemin,pdemax)
 
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
