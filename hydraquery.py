@@ -24,22 +24,24 @@ def getQueries(homedir):
     thisquery = ''
     for line in f.readlines():
         if line.strip().startswith('/*'):
-            iscomment = True
+            if not line.strip().endswith('*/'): #we're starting a comment block
+                iscomment = True
             if isquery: #then we just finished a query
-                queries.append(thisquery)
+                if len(thisquery.strip()):
+                    queries.append(thisquery.strip())
                 thisquery = ''
                 isquery = False
                 continue
             else:
                 continue
-        if line.strip().endswith('*/') and not line.strip().startswith('/*'):
+        if line.strip().endswith('*/') and iscomment: #we're ending a comment block
             iscomment = False
             continue
-        if not iscomment and not isquery:
+        if not iscomment:
             isquery = True
-            thisquery += line.strip()
+            thisquery += ' ' + line.strip()
     if isquery:
-        queries.append(thisquery) #grab the last one, if not followed by comment block     
+        queries.append(thisquery.strip()) #grab the last one, if not followed by comment block     
     f.close()
     return queries
 
@@ -161,12 +163,24 @@ def main():
 
     querylist = getQueries(homedir)
     for query in querylist:
-        print '"%s"' % query
+        query = query.replace('[STARTPDE]',str(starttime))
+        query = query.replace('[ENDPDE]',str(endtime))
+        try:
+            cursor.execute(query)
+            db.commit()
+        except cx_Oracle.DatabaseError, exc:
+            print 'Error executing query:\n%s\n' % query
+            error, = exc.args
+            print "Oracle-Error-Code:", error.code
+            print "Oracle-Error-Message:", error.message
+            sys.exit(1)
+            
     
     cursor.close()
     db.close()
 
 if __name__ == '__main__':
+    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     main()
     sys.exit(0)
     

@@ -25,7 +25,7 @@ insert into HDB_MONITOR.PDEHydra(idEvent, OT, Lat, Lon, Depth, Mag, idBHPF, iPDE
 	group by idevent
 	) mbhp
  where bhp.idBHPellet = mbhp.idBHPellet
-   and bhp.tOrigin between :MIKE_PDE_START and :MIKE_PDE_END 
+   and bhp.tOrigin between [STARTPDE] and [ENDPDE]
 );
 
 /******************************************************/
