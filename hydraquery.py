@@ -48,7 +48,7 @@ def main():
     password = config.get('DATABASE','password')
     sid = config.get('DATABASE','sid')
     tns = cx_Oracle.makedsn(ip,port,sid)
-    db = cx_Oracle.connect(user,passwd,tns)
+    db = cx_Oracle.connect(user,password,tns)
     cursor = db.cursor()
     pdenumber = getMostRecentPDE(cursor)
     if pdenumber <= lastprocessed:
