@@ -246,7 +246,7 @@ set idAOHInit =
 	 )
 where idEvent IS NOT NULL
 
-end
+end;
 
 /* 4p  idAOHAuto - Hydra Origin for last auto pellet (assumes origins inserted in time order) */
 declare
@@ -266,7 +266,7 @@ set idAOHAuto =
 	 )
 where idEvent IS NOT NULL
 
-end
+end;
 
 /* 4q  idAOHQR - Hydra Origin for first QR pellet (assumes origins inserted in time order) */
 declare
@@ -287,7 +287,7 @@ set idAOHQR =
 	 )
 where idBHPQR IS NOT NULL
 
-end
+end;
 
 /* 4r  idAOHF - Hydra Origin for Final pub pellet (assumes origins inserted in time order) */
 declare
@@ -307,7 +307,7 @@ set idAOHF =
 	 )
 where idEvent IS NOT NULL
 
-end
+end;
 
 /* 4s  idAOH10 - Hydra Origin for Final pellet prior to OT + 10 min (assumes origins inserted in time order) */
 declare
@@ -327,7 +327,7 @@ set idAOH10 =
 	 )
 where idEvent IS NOT NULL
 
-end
+end;
 
 /* 4t  Initial EventClaim record  - assumes EventClaim records are inserted in time order */
 update HDB_MONITOR.PDEHydra p
