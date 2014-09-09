@@ -59,6 +59,26 @@ def insertBaseRecords(cursor,db,tstart,tend):
     nrows = cursor.fetchone()[0]
     return nrows
 
+def addInitialDetection(cursor,db):
+    query = '''update HDB_MONITOR.PDEHydra p
+    set IDAOINITIAL = 
+    (select min(ao2.idactualorigin) 
+    from  all_actualorigin_info AO1, all_actualorigin_info AO2
+    where AO1.idActualOrigin = (select min(idactualorigin) idAO 
+    from all_event_origin_info aeoi
+    where aeoi.idevent = p.idevent
+    and torigininserted = (select min(torigininserted) from all_event_origin_info where idevent = p.idevent and bitand(iAuthorType, 256) = 0)
+    and bitand(iAuthorType, 256) = 0
+    )
+    and AO1.sauthoreventid = AO2.sauthoreventid
+	and AO1.idAuthor = AO2.idAuthor
+    )
+    where idEvent IS NOT NULL'''
+    query = query.replace('\r',' ')
+    query = query.replace('\t',' ')
+    cursor.execute(query)
+    db.commit()
+    
 
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
@@ -93,6 +113,7 @@ def main():
         print 'Could not empty the PDE table!'
         sys.exit(1)
     nrows = insertBaseRecords(cursor,db,starttime,endtime)
+    addInitialDetection(cursor,db)
     
     print '%i events discovered between %s and %s' % (nrows,startdate,enddate)
     
