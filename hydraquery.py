@@ -31,7 +31,7 @@ def getQueries(homedir):
                 continue
         else:
             isquery = True
-            thisquery.append(line.strip())
+            thisquery += line.strip()
     if isquery:
         queries.append(thisquery) #grab the last one, if not followed by comment block     
     f.close()
