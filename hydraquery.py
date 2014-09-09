@@ -12,6 +12,31 @@ import cx_Oracle
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 DEBUG = True
 
+def getQueries(homedir):
+    #assume the template file is a bunch of SQL queries bracketed by C++ style
+    #comment blocks.  Whenever a comment block starts, if we've been processing
+    #lines as a query, that query stops and gets added to the list.
+    queryfile = os.path.join(homedir,'query.template')
+    f = open(queryfile,'rt')
+    queries = []
+    isquery = False
+    thisquery = ''
+    for line in f.readlines():
+        if line.strip().startswith('/*') or line.strip().endswith('*/'):
+            if isquery: #then we just finished a query
+                queries.append(thisquery)
+                thisquery = ''
+                isquery = False
+            else:
+                continue
+        else:
+            isquery = True
+            thisquery.append(line.strip())
+    if isquery:
+        queries.append(thisquery) #grab the last one, if not followed by comment block     
+    f.close()
+    return queries
+
 def getMostRecentPDE(cursor):
     query = 'select get_pde_from_ot(max(torigin)) from all_events_info_no_nph where iworkflowstatus = 8192'
     cursor.execute(query)
@@ -80,6 +105,26 @@ def addInitialDetection(cursor,db):
     db.commit()
     
 
+def getGlassDetection(cursor,db):
+    query = '''update HDB_MONITOR.PDEHydra p
+    set IDAOGLASS = 
+    (select min(ao2.idactualorigin) 
+    from All_actualorigin_info AO1, All_actualorigin_info AO2
+    where AO1.idActualOrigin = (select min(idactualorigin) idAO 
+    from all_event_origin_info aeoi
+    where aeoi.idevent = p.idevent
+    and torigininserted = (select min(torigininserted) from all_event_origin_info where idevent = p.idevent and sauthornamehr like '%GLASS%' and sinstcode='NEIC')
+    and sauthornamehr like '%GLASS%' and sinstcode='NEIC'
+    )
+    and AO1.sauthoreventid = AO2.sauthoreventid
+	and AO1.idAuthor = AO2.idAuthor
+    )
+    where idEvent IS NOT NULL'''
+    query = query.replace('\r',' ')
+    query = query.replace('\t',' ')
+    cursor.execute(query)
+    db.commit()
+    
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     lastfile = os.path.join(homedir,'lastprocessed.txt')
@@ -107,15 +152,10 @@ def main():
     starttime,endtime = getPDERange(cursor,pdenumber)
     startdate = datetime.utcfromtimestamp(starttime)
     enddate = datetime.utcfromtimestamp(endtime)
-    
-    res = emptyTable(cursor,db)
-    if not res:
-        print 'Could not empty the PDE table!'
-        sys.exit(1)
-    nrows = insertBaseRecords(cursor,db,starttime,endtime)
-    addInitialDetection(cursor,db)
-    
-    print '%i events discovered between %s and %s' % (nrows,startdate,enddate)
+
+    querylist = getQueries(homedir)
+    for query in querylist:
+        print '"%s"' % query
     
     cursor.close()
     db.close()
