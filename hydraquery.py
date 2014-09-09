@@ -85,12 +85,16 @@ def main():
         print 'Most recent PDE is not newer than the most recently processed.  Exiting.'
         sys.exit(0)
     starttime,endtime = getPDERange(cursor,pdenumber)
-
+    startdate = datetime.utcfromtimestamp(starttime)
+    enddate = datetime.utcfromtimestamp(endtime)
+    
     res = emptyTable(cursor,db)
     if not res:
         print 'Could not empty the PDE table!'
         sys.exit(1)
-    insertBaseRecords(cursor,db,starttime,endtime)
+    nrows = insertBaseRecords(cursor,db,starttime,endtime)
+    
+    print '%i events discovered between %s and %s' % (startdate,enddate
     
     cursor.close()
     db.close()
