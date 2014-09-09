@@ -39,7 +39,7 @@ def getQueries(homedir):
             continue
         if not iscomment:
             isquery = True
-            thisquery += ' ' + line
+            thisquery += line
     if isquery:
         queries.append(thisquery) #grab the last one, if not followed by comment block     
     f.close()
