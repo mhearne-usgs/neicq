@@ -131,7 +131,12 @@ def retrieveData(cursor,db,starttime,endtime):
 
     nevents = getEventCount(cursor)
     #now do the monster query
-    cursor.execute(MONSTER_QUERY)
+    try:
+        cursor.execute(MONSTER_QUERY)
+    except cx_Oracle.DatabaseError, exc:
+        error, = exc.args
+        print "Oracle-Error-Code:", error.code
+        print "Oracle-Error-Message:", error.message
     rows = cursor.fetchall()
 
     return rows
