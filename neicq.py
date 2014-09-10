@@ -23,21 +23,12 @@ def filterMissingData(dataframe):
     return df
 
 def addTimeColumn(dataframe):
-    dates = dataframe['EVENT_DATE']
-    times = dataframe['_TIME']
+    #2014/06/10 16:01:27
+    TIMEFMT = '%Y/%m/%d %H:%M:%S'
     etimes = []
     for i in range(0,len(dataframe)):
-        d = dates[i]
-        t = times[i]
-        hour,minute,sec = t.split(':')
-        hour = int(hour)
-        minute = int(minute)
-        sec = int(sec)
-        mon,day,year = d.split('/')
-        mon = int(mon)
-        day = int(day)
-        year = int(year)
-        etimes.append(datetime(year,mon,day,hour,minute,sec))
+        dstr = dataframe['EVENT_DATE_TIME'][i]
+        etimes.append(datetime.strptime(d,dstr)
     dataframe['etime'] = pd.Series(etimes)
     return dataframe
 
