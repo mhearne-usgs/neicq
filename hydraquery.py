@@ -161,8 +161,12 @@ def main():
     startdate = datetime.utcfromtimestamp(starttime)
     enddate = datetime.utcfromtimestamp(endtime)
 
-    res = cursor.callproc('qa_do_quarterly_prep',[starttime,endtime])
-            
+    try:
+        res = cursor.callproc('qa_do_quarterly_prep',[starttime,endtime])
+    except cx_Oracle.DatabaseError, exc:
+        error, = exc.args
+        print "Oracle-Error-Code:", error.code
+        print "Oracle-Error-Message:", error.message
     
     cursor.close()
     db.close()
