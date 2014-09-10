@@ -202,7 +202,6 @@ def main():
     db,cursor = getConnection(config)
     pdenumber = getMostRecentPDE(cursor)
 
-    outfolder = config.get('OUTPUT','data')
     header = ','.join(QUERY_COLUMNS)
     
     #weekly check
@@ -211,7 +210,7 @@ def main():
         startdate = datetime.utcfromtimestamp(starttime)
         enddate = datetime.utcfromtimestamp(endtime)
         rows = retrieveData(cursor,db,starttime,endtime)
-        weekfile = os.path.join(outfolder,str(pdenumber)+'.csv')
+        weekfile = os.path.join(datadir,str(pdenumber)+'.csv')
         f = open(weekfile,'wt')
         f.write(header+'\n')
         for row in rows:
