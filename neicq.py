@@ -7,6 +7,8 @@ from datetime import datetime
 from collections import Counter
 
 #third party imports
+import matplotlib
+matplotlib.use('Agg')
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
