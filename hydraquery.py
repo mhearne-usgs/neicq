@@ -14,7 +14,7 @@ DEBUG = True
 
 QUARTERS = {13:'Q1',26:'Q2',39:'Q3',52:'Q4'}
 
-MONSTER_QUERY = '''select
+MONSTER_QUERY = '''select /*+ FIRST_ROWS(1) */
  nvl(substr(el.huidevent,1,8), 'NaN')  || ',' EventCode, nvl(substr(el.teventcreated - aoInitial.torigin, 1, 10), 'NaN')  || ',' tDetectLatency,
    	nvl(substr(p.OT,1,13), 'NaN') || ',' tOriginPDE, nvl(substr(round(p.Mag,1),1,10), 'NaN') || ','  MagPDE,
    	nvl(substr(p.Lat,1,10), 'NaN') || ','  dLatPDE, nvl(substr(p.Lon,1,10), 'NaN') || ','  dLonPDE,
