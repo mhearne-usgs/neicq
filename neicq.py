@@ -177,6 +177,6 @@ def main(dataframe):
     
 if __name__ == '__main__':
     datafile = sys.argv[1]
-    data = pd.read_csv(datafile)
+    data = pd.read_csv(datafile,index_col=False)
     main(data)
     
