@@ -105,7 +105,7 @@ MONSTER_QUERY = '''select /*+ FIRST_ROWS(1) */
    and p.idAOH10 = AOH10.idActualOrigin(+)
    and p.idAOHAuto = AOHAuto.idActualOrigin(+)
    and p.idAOGlass = AOGlass.idActualOrigin(+)
-;'''
+'''
 
 QUERY_COLUMNS = ['EVENTCODE','TDETECTLATENCY','TORIGINPDE','MAGPDE','DLATPDE','DLONPDE','DDEPTHPDE',
                  'IUSEDPHFINAL','TORIGININITIAL','MAGINITIAL','DLATINITIAL','DLONINITIAL','DDEPTHINITIAL',
