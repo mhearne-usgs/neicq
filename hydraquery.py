@@ -161,19 +161,7 @@ def main():
     startdate = datetime.utcfromtimestamp(starttime)
     enddate = datetime.utcfromtimestamp(endtime)
 
-    querylist = getQueries(homedir)
-    for query in querylist:
-        query = query.replace('[STARTPDE]',str(starttime))
-        query = query.replace('[ENDPDE]',str(endtime))
-        try:
-            cursor.execute(query)
-            db.commit()
-        except cx_Oracle.DatabaseError, exc:
-            print 'Error executing query:\n"%s"\n' % query
-            error, = exc.args
-            print "Oracle-Error-Code:", error.code
-            print "Oracle-Error-Message:", error.message
-            sys.exit(1)
+    res = cx_Oracle.callproc('qa_do_quarterly_prep',starttime,endtime)
             
     
     cursor.close()
