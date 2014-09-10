@@ -18,6 +18,24 @@ def getEventCount(cursor):
     nevents = cursor.fetchone()[0]
     return nevents
 
+def getPDERange(cursor,pdenumber):
+    if DEBUG:
+        pdemin = 1397600000
+        pdemax = 1397610000
+    else:
+        query = 'select get_start_of_pde(pdenumber), get_end_of_pde(pdenumber) from dual'
+        cursor.execute(query)
+        row = cursor.fetchone()
+        pdemin = row[0]
+        pdemax = row[1]
+    return (pdemin,pdemax)
+
+def getMostRecentPDE(cursor):
+    query = 'select get_pde_from_ot(max(torigin)) from all_events_info_no_nph where iworkflowstatus = 8192'
+    cursor.execute(query)
+    pdestr = cursor.fetchone()[0]
+    return pdestr
+
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     lastfile = os.path.join(homedir,'lastprocessed.txt')
@@ -47,13 +65,15 @@ def main():
     enddate = datetime.utcfromtimestamp(endtime)
 
     try:
-        rc = None
+        rc = cursor.var(cx_Oracle.NUMBER)
         res = cursor.callproc('qa_do_quarterly_prep',[rc,starttime,endtime])
     except cx_Oracle.DatabaseError, exc:
         error, = exc.args
         print "Oracle-Error-Code:", error.code
         print "Oracle-Error-Message:", error.message
 
+    if rc != 0:
+        print 'Report prep procedure failed: Error code %i' % rc
     nevents = getEventCount(cursor)
     print '%i events created in pde report table.' % nevents
     cursor.close()
