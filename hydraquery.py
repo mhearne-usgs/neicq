@@ -149,11 +149,16 @@ def getPDERange(cursor,pdenumber):
         pdemin = 1397600000
         pdemax = 1397610000
     else:
-        query = 'select get_start_of_pde(pdenumber), get_end_of_pde(pdenumber) from dual'
-        cursor.execute(query)
-        row = cursor.fetchone()
-        pdemin = row[0]
-        pdemax = row[1]
+        try:
+            query = 'select get_start_of_pde(pdenumber), get_end_of_pde(pdenumber) from dual'
+            cursor.execute(query)
+            row = cursor.fetchone()
+            pdemin = row[0]
+            pdemax = row[1]
+        except cx_Oracle.DatabaseError, exc:
+            error, = exc.args
+            print "Oracle-Error-Code:", error.code
+            print "Oracle-Error-Message:", error.message
     return (pdemin,pdemax)
 
 def getMostRecentPDE(cursor):
