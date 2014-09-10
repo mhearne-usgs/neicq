@@ -72,7 +72,7 @@ def main():
         print "Oracle-Error-Code:", error.code
         print "Oracle-Error-Message:", error.message
 
-    if rc != 0:
+    if rc.getvalue() != 0:
         print 'Report prep procedure failed: Error code %i' % rc
     nevents = getEventCount(cursor)
     print '%i events created in pde report table.' % nevents
