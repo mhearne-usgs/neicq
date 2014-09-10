@@ -28,7 +28,7 @@ def addTimeColumn(dataframe):
     etimes = []
     for i in range(0,len(dataframe)):
         dstr = dataframe['EVENT_DATE_TIME'][i]
-        etimes.append(datetime.strptime(d,dstr)
+        etimes.append(datetime.strptime(d,dstr))
     dataframe['etime'] = pd.Series(etimes)
     return dataframe
 
