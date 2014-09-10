@@ -162,10 +162,7 @@ def getMostRecentPDE(cursor):
     pdestr = cursor.fetchone()[0]
     return pdestr
 
-def getConnection(homedir):
-    configfile = os.path.join(homedir,'config.ini')
-    config = ConfigParser.ConfigParser()
-    config.readfp(open(configfile))
+def getConnection(config):
     ip = config.get('DATABASE','ip')
     port = int(config.get('DATABASE','port'))
     user = config.get('DATABASE','user')
@@ -178,6 +175,9 @@ def getConnection(homedir):
 
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
+    configfile = os.path.join(homedir,'config.ini')
+    config = ConfigParser.ConfigParser()
+    config.readfp(open(configfile))
     lastfile = os.path.join(homedir,'lastprocessed.txt')
     if not os.path.isfile(lastfile):
         lastprocessed = 190001
@@ -186,7 +186,7 @@ def main():
         lastprocessed = int(f.readline().strip())
         f.close()
 
-    db,cursor = getConnection(homedir)
+    db,cursor = getConnection(config)
     pdenumber = getMostRecentPDE(cursor)
 
     outfolder = config.get('OUTPUT','data')
