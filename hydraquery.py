@@ -161,7 +161,7 @@ def main():
     startdate = datetime.utcfromtimestamp(starttime)
     enddate = datetime.utcfromtimestamp(endtime)
 
-    res = cursor.callproc('qa_do_quarterly_prep',starttime,endtime)
+    res = cursor.callproc('qa_do_quarterly_prep',[starttime,endtime])
             
     
     cursor.close()
