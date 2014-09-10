@@ -207,7 +207,7 @@ def main():
         f = open(weekfile,'wt')
         f.write(header+'\n')
         for row in rows:
-            rowstr = ','.join(row)
+            rowstr = ''.join(row)
             f.write(rowstr+'\n')
         f.close()
     
