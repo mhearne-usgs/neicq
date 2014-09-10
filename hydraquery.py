@@ -150,7 +150,7 @@ def getPDERange(cursor,pdenumber):
         pdemax = 1397610000
     else:
         try:
-            query = 'select get_start_of_pde(pdenumber), get_end_of_pde(pdenumber) from dual'
+            query = 'select get_start_of_pde(%i), get_end_of_pde(%i) from dual' % (pdenumber,pdenumber)
             cursor.execute(query)
             row = cursor.fetchone()
             pdemin = row[0]
