@@ -222,7 +222,8 @@ def main():
         f.close()
 
         #make weekly plots
-        neicq.main(weekfile,plotdir)
+        weekdir = os.path.join(plotdir,pdenumber)
+        neicq.main(weekfile,weekdir)
     
     cursor.close()
     db.close()
