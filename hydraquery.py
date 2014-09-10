@@ -182,7 +182,7 @@ def getLastProcessed(datadir):
     allfiles = os.listdir(datadir)
     weekfiles = []
     for afile in allfiles:
-        if afile.find('Q'):
+        if afile.find('Q') > -1:
             continue
         weekfiles.append(afile)
     weekfiles.sort()
