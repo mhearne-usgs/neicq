@@ -186,6 +186,8 @@ def getLastProcessed(datadir):
             continue
         weekfiles.append(afile)
     weekfiles.sort()
+    if not len(weekfiles):
+        return 190001
     lastprocessed,ext = os.path.splitext(weekfiles[-1])
     return int(lastprocessed)
 
