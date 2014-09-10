@@ -178,19 +178,25 @@ def getConnection(config):
     cursor = db.cursor()
     return (db,cursor)
 
+def getLastProcessed(datadir):
+    allfiles = os.listdir(datadir)
+    weekfiles = []
+    for afile in allfiles:
+        if afile.find('Q'):
+            continue
+        weekfiles.append(afile)
+    weekfiles.sort()
+    lastprocessed,ext = os.path.splitext(weekfiles[-1])
+    return int(lastprocessed)
+
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     configfile = os.path.join(homedir,'config.ini')
     config = ConfigParser.ConfigParser()
     config.readfp(open(configfile))
-    lastfile = os.path.join(homedir,'lastprocessed.txt')
-    if not os.path.isfile(lastfile):
-        lastprocessed = 190001
-    else:
-        f = open(lastfile,'rt')
-        lastprocessed = int(f.readline().strip())
-        f.close()
-
+    datadir = config.get('OUTPUT','data')
+    plotdir = config.get('OUTPUT','plots')
+    lastprocessed = getLastProcessed(datadir)
     db,cursor = getConnection(config)
     pdenumber = getMostRecentPDE(cursor)
 

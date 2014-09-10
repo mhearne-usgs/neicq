@@ -16,6 +16,7 @@ import pandas as pd
 
 #local imports
 from neicmap import distance
+from neicutil import text
 
 def filterMissingData(dataframe):
     nanfields = ['MAGPDE','DLATPDE','DLONPDE'] #fields which may have NaN values in them
@@ -40,8 +41,12 @@ def createSeismicityMap(dataframe):
     lat = dataframe['DLATPDE'].as_matrix()
     lon = dataframe['DLONPDE'].as_matrix()
     mag = dataframe['MAGPDE'].as_matrix()
-    mintimestr = min(etimes).strftime('%b %Y')
-    maxtimestr = max(etimes).strftime('%b %Y')
+    if (max(etimes) - min(etimes)).days > 7:
+        mintimestr = min(etimes).strftime('%b %Y')
+        maxtimestr = max(etimes).strftime('%b %Y')
+    else:
+        mintimestr = min(etimes).strftime('%b %d, %Y')
+        maxtimestr = max(etimes).strftime('%b %d, %Y')
     lon[lon < 0] += 360 #longitudes less than 0 don't get plotted
     try:
         x,y = m(lon,lat) #convert lat/lon data into map coordinates
@@ -83,11 +88,11 @@ def createDeltaPlots(dataframe):
     df2 = df2[np.isfinite(df2['MAGINITIAL'])]
     firstmag = dataframe['MAGINITIAL'].as_matrix()
     lastmag = dataframe['MAGPDE'].as_matrix()
-    firstdepth = dataframe['DDE'].as_matrix()
+    firstdepth = dataframe['DDEPTHINITIAL'].as_matrix()
     lastdepth = dataframe['DDEPTHPDE'].as_matrix()
-    firstlat = dataframe['DLATINITIA'].as_matrix()
+    firstlat = dataframe['DLATINITIAL'].as_matrix()
     lastlat = dataframe['DLATPDE'].as_matrix()
-    firstlon = dataframe['DLONINITIA'].as_matrix()
+    firstlon = dataframe['DLONINITIAL'].as_matrix()
     lastlon = dataframe['DLONPDE'].as_matrix()
 
     dmag = lastmag - firstmag
@@ -148,17 +153,19 @@ def createResponsePlot(dataframe):
     imag5 = (mag >= 5.0).nonzero()[0]
     imag55 = (mag >= 5.5).nonzero()[0]
     fig = plt.figure(figsize=(8,6))
-    plt.hist(response[imag5],color='g',bins=60,range=(0,60))
+    n,bins,patches = plt.hist(response[imag5],color='g',bins=60,range=(0,60))
     plt.hold(True)
     plt.hist(response[imag55],color='b',bins=60,range=(0,60))
     plt.xlabel('Response Time (min)')
     plt.ylabel('Number of earthquakes')
     plt.xticks(np.arange(0,65,5))
-    plt.yticks(np.arange(0,105,10))
+    ymax = text.ceilToNearest(max(n),10)
+    yinc = ymax/10
+    plt.yticks(np.arange(0,ymax+yinc,yinc))
     plt.grid(True,which='both')
     plt.hold(True)
     x = [20,20]
-    y = [0,100]
+    y = [0,ymax]
     plt.plot(x,y,'r',linewidth=2,zorder=10)
     s1 = 'Magnitude 5.0, Events = %i' % (len(imag5))
     s2 = 'Magnitude 5.5, Events = %i' % (len(imag55))
@@ -168,17 +175,18 @@ def createResponsePlot(dataframe):
     print 'Saving response.pdf'
     
     
-def main(dataframe):
+def main(datafile,plotdir):
+    dataframe = pd.read_csv(datafile,index_col=False)
     dataframe = filterMissingData(dataframe)
     dataframe = addTimeColumn(dataframe)
-    createSeismicityMap(dataframe)
-    createDeltaPlots(dataframe)
-    createMagHist(dataframe)
-    createSourceHist(dataframe)
-    createResponsePlot(dataframe)
+    createSeismicityMap(dataframe,plotdir)
+    createDeltaPlots(dataframe,plotdir)
+    createMagHist(dataframe,plotdir)
+    createSourceHist(dataframe,plotdir)
+    createResponsePlot(dataframe,plotdir)
     
 if __name__ == '__main__':
     datafile = sys.argv[1]
-    data = pd.read_csv(datafile,index_col=False)
-    main(data)
+    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
+    main(datafile,homedir)
     
