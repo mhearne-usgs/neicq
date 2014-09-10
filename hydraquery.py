@@ -9,6 +9,9 @@ import ConfigParser
 #third party imports
 import cx_Oracle
 
+#local imports
+import neicq
+
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 DEBUG = False
 
@@ -217,6 +220,9 @@ def main():
             rowstr = ''.join(row)
             f.write(rowstr+'\n')
         f.close()
+
+        #make weekly plots
+        neicq.main(weekfile,plotdir)
     
     cursor.close()
     db.close()

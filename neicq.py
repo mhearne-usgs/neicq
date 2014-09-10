@@ -5,6 +5,7 @@ import csv
 import sys
 from datetime import datetime
 from collections import Counter
+import os.path
 
 #third party imports
 import matplotlib
@@ -35,7 +36,7 @@ def addTimeColumn(dataframe):
     dataframe['etime'] = pd.Series(etimes)
     return dataframe
 
-def createSeismicityMap(dataframe):
+def createSeismicityMap(dataframe,plotdir):
     m = Basemap(projection='mill',lon_0=180)
     etimes = dataframe['etime']
     lat = dataframe['DLATPDE'].as_matrix()
@@ -79,11 +80,12 @@ def createSeismicityMap(dataframe):
     
     plt.title('%i events published from %s to %s' % (len(x),mintimestr,maxtimestr))
     plt.legend(['<5','5 to 5.9','6 to 6.9','7 to 7.9','>= 8'],numpoints=1,loc=3,fontsize=8)
-    plt.savefig('seismicity.pdf')
+    plt.savefig(os.path.join(plotdir,'seismicity.pdf'))
+    plt.savefig(os.path.join(plotdir,'seismicity.png'))
     plt.close()
     print 'Creating seismicity.pdf'
 
-def createDeltaPlots(dataframe):
+def createDeltaPlots(dataframe,plotdir):
     df2 = dataframe.copy()
     df2 = df2[np.isfinite(df2['MAGINITIAL'])]
     firstmag = dataframe['MAGINITIAL'].as_matrix()
@@ -115,20 +117,22 @@ def createDeltaPlots(dataframe):
     plt.ylabel(ylabel)
     plt.title('epicentral change [km]')
     fig.tight_layout()
-    plt.savefig('changes.pdf')
+    plt.savefig(os.path.join(plotdir,'changes.pdf'))
+    plt.savefig(os.path.join(plotdir,'changes.png'))
     plt.close()
     print 'Saving changes.pdf'
 
-def createMagHist(dataframe):
+def createMagHist(dataframe,plotdir):
     lastmag = dataframe['MAGPDE'].as_matrix()
     plt.hist(lastmag,bins=64)
     plt.ylabel('# of earthquakes')
     plt.xlabel('magnitude')
-    plt.savefig('maghist.pdf')
+    plt.savefig(os.path.join(plotdir,'maghist.pdf'))
+    plt.savefig(os.path.join(plotdir,'maghist.png'))
     plt.close()
     print 'Creating maghist.pdf'
 
-def createSourceHist(dataframe):
+def createSourceHist(dataframe,plotdir):
     source = dataframe['SINSTFIR'].tolist()
     c = Counter(source)
     s = pd.Series(c)
@@ -142,11 +146,12 @@ def createSourceHist(dataframe):
     ax.tick_params(axis='both', labelsize=8)
     plt.ylabel('Source Code')
     plt.xlabel('number of hypocenters contributed')
-    plt.savefig('sourcehist.pdf')
+    plt.savefig(os.path.join(plotdir,'sourcehist.pdf'))
+    plt.savefig(os.path.join(plotdir,'sourcehist.png'))
     plt.close()
     print 'Creating sourcehist.pdf'
 
-def createResponsePlot(dataframe):
+def createResponsePlot(dataframe,plotdir):
     mag = dataframe['MAGPDE'].as_matrix()
     response = (dataframe['TFIRSTPUB'].as_matrix())/60.0
     response[response > 60] = 60 #anything over 60 minutes capped at 6 minutes
@@ -171,7 +176,8 @@ def createResponsePlot(dataframe):
     s2 = 'Magnitude 5.5, Events = %i' % (len(imag55))
     plt.text(35,85,s1,color='g')
     plt.text(35,75,s2,color='b')
-    plt.savefig('response.pdf')
+    plt.savefig(os.path.join(plotdir,'response.pdf'))
+    plt.savefig(os.path.join(plotdir,'response.png'))
     print 'Saving response.pdf'
     
     
