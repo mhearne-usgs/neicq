@@ -223,6 +223,8 @@ def main():
 
         #make weekly plots
         weekdir = os.path.join(plotdir,str(pdenumber))
+        if not os.path.isdir(weekdir):
+            os.mkdir(weekdir)
         neicq.main(weekfile,weekdir)
     
     cursor.close()
