@@ -10,7 +10,7 @@ import ConfigParser
 import cx_Oracle
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
-DEBUG = True
+DEBUG = False
 
 QUARTERS = {13:'Q1',26:'Q2',39:'Q3',52:'Q4'}
 
@@ -109,7 +109,7 @@ QUERY_COLUMNS = ['EVENTCODE','TDETECTLATENCY','TORIGINPDE','MAGPDE','DLATPDE','D
                  'DERRMAXHKM','DERRMAXZKM','SCHEDULED_ANALYST','ANALYST1STCLAIM','T1STCLAIMED','ANALYSTLASTCLAIM',
                  'TLASTUNCLAIM','ANALYSTFIRSTPUB','QUICK','TFIRSTPUB','ANALYST2NDPUB','Q2UIC','TSECONDPUB',
                  'SINSTFIR','TFIRSTEXTP','TFIRSTATWC','TFIRSTPTWC','TFIRSTATWC','TFIRSTPTWC','INSHA',
-                 'TBECAMERESP','EVENT_DATE','_TIME','PREFMAGCURRENT','DLATCURRENT','DLONCURRENT','DDEPTHCURRENT',
+                 'TBECAMERESP','EVENT_DATE_TIME','PREFMAGCURRENT','DLATCURRENT','DLONCURRENT','DDEPTHCURRENT',
                  'TORIGINCURRENT','IUSEDPHCURRENT','TFIRSTGLASS','TORIGINFIRST','MAGFIRST','DLATFIRST','DLONFIRST',
                  'DDEPTHFIRST','TORIGINAUTO','MAGAUTO','DLATAUTO','DLONAUTO','DDEPTHAUTO','TORIGIN10','MAG10',
                  'DLAT10','DLON10','DDEPTH10','iPDENum','Felt']
@@ -189,14 +189,22 @@ def main():
     db,cursor = getConnection(homedir)
     pdenumber = getMostRecentPDE(cursor)
 
+    outfolder = config.get('OUTPUT','data')
+    header = ','.join(QUERY_COLUMNS)
+    
     #weekly check
-    if pdenumber <= lastprocessed:
-        print 'Most recent PDE (%i) is not newer than the most recently processed (%i).  Exiting.'
-    starttime,endtime = getPDERange(cursor,pdenumber)
-    startdate = datetime.utcfromtimestamp(starttime)
-    enddate = datetime.utcfromtimestamp(endtime)
-
-    rows = retrieveData(cursor,db,starttime,endtime)
+    if pdenumber > lastprocessed:
+        starttime,endtime = getPDERange(cursor,pdenumber)
+        startdate = datetime.utcfromtimestamp(starttime)
+        enddate = datetime.utcfromtimestamp(endtime)
+        rows = retrieveData(cursor,db,starttime,endtime)
+        weekfile = os.path.join(outfolder,str(pdenumber)+'.csv')
+        f = open(weekfile,'wt')
+        f.write(header+'\n')
+        for row in rows:
+            rowstr = ','.join(row)
+            f.write(rowstr+'\n')
+        f.close()
     
     cursor.close()
     db.close()
