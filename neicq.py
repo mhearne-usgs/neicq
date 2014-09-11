@@ -98,6 +98,11 @@ def createDeltaPlots(dataframe,plotdir):
     ddepth = lastdepth - firstdepth
     dloc = distance.sdist(firstlat,firstlon,lastlat,lastlon)/1000.0
 
+    #get the number of 
+    nmag = len((np.abs(dmag) > 1.0).nonzero()[0])
+    ndepth = len((np.abs(ddepth) > 50).nonzero()[0])
+    ndist = len((np.abs(dloc) > 100).nonzero()[0])
+
     ylabel = '# of earthquakes'
     
     fig,axeslist = plt.subplots(nrows=3,ncols=1)
@@ -107,9 +112,9 @@ def createDeltaPlots(dataframe,plotdir):
     plt.sca(axeslist[0])
     dmag[dmag > 1.0] = 1.0
     dmag[dmag < -1.0] = -1.0
-    drange1 = np.arange(-2.1,2.1,0.1)
+    drange1 = np.arange(-2.05,2.05,0.1)
     drange2 = np.arange(-2.0,2.5,0.5)
-    plt.hist(dmag,bins=drange1,align='left')
+    plt.hist(dmag,bins=drange1,align='mid')
     axlim = plt.axis()
     plt.xticks(drange2)
     #plt.axis([-1.1,1.1,axlim[2],axlim[3]])
@@ -120,7 +125,7 @@ def createDeltaPlots(dataframe,plotdir):
     ddepth[ddepth > 50] = 50
     ddepth[ddepth < -50] = -50
     plt.sca(axeslist[1])
-    plt.hist(ddepth,bins=np.arange(-50,50,5),align='left')
+    plt.hist(ddepth,bins=np.arange(-52.5,52.5,5),align='mid')
     axlim = plt.axis()
     plt.axis([-50.0,50.0,axlim[2],axlim[3]])
     plt.xticks(np.arange(-50,60,10))
@@ -130,18 +135,19 @@ def createDeltaPlots(dataframe,plotdir):
     #location change histogram
     dloc[dloc > 100] = 100
     plt.sca(axeslist[2])
-    plt.hist(dloc,bins=np.arange(5,105,5),align='left')
+    plt.hist(dloc,bins=np.arange(2.5,105.5,5),align='mid')
     plt.ylabel(ylabel)
     axlim = plt.axis()
     #plt.xticks(np.arange(0,100,20))
-    plt.axis([5,100,axlim[2],axlim[3]])
     plt.xticks(np.arange(0,120,20))
+    plt.axis([0,105,axlim[2],axlim[3]])
     plt.title('epicentral change [km]')
     fig.tight_layout()
     plt.savefig(os.path.join(plotdir,'changes.pdf'))
     plt.savefig(os.path.join(plotdir,'changes.png'))
     plt.close()
     print 'Saving changes.pdf'
+    return (nmag,ndepth,ndist)
 
 def createMagHist(dataframe,plotdir):
     lastmag = dataframe['MAGPDE'].as_matrix()
@@ -206,11 +212,28 @@ def makePlots(datafile,plotdir):
     dataframe = pd.read_csv(datafile,index_col=False)
     dataframe = filterMissingData(dataframe)
     dataframe = addTimeColumn(dataframe)
+    
+    #remove events where final origin time - initial origin time > 100 seconds
+    t1 = dataframe['TORIGININITIAL'].as_matrix()
+    t2 = dataframe['TORIGINPDE'].as_matrix()
+    inan = np.isnan(t1).nonzero()[0]
+    t1[inan] = t2[inan]
+    dt = t2-t1
+    idt = dt < 100
+    dataframe = dataframe[idt]
+    
     createSeismicityMap(dataframe,plotdir)
-    createDeltaPlots(dataframe,plotdir)
+    nmag,ndepth,ndist = createDeltaPlots(dataframe,plotdir)
     createMagHist(dataframe,plotdir)
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
+    statsfile = os.path.join(plotdir,'statistics.txt')
+    f = open(statsfile,'wt')
+    f.write('TotalEvents: %i\n' % len(dataframe))
+    f.write('DeltaMag > 0.5: %i Percentage: %.2f%%\n' % (nmag,(float(nmag)/len(dataframe))*100))
+    f.write('DeltaDepth > 50: %i Percentage: %.2f%%\n' % (ndepth,(float(ndepth)/len(dataframe))*100))
+    f.write('DeltaLoc > 100: %i Percentage: %.2f%%\n' % (ndist,(float(ndist)/len(dataframe))*100))
+    f.close()
     
 if __name__ == '__main__':
     datafile = sys.argv[1]
