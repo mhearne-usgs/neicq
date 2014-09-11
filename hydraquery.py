@@ -140,6 +140,9 @@ def retrieveData(cursor,db,starttime,endtime):
         print "Oracle-Error-Message:", error.message
     rows = cursor.fetchall()
 
+    #sort the rows by origin time
+    rows.sort(key = lambda row: (row[2]))
+    
     return rows
 
 def getEventCount(cursor):
