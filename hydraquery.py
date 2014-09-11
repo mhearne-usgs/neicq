@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 import os.path
 import ConfigParser
+import re
 
 #third party imports
 import cx_Oracle
@@ -182,17 +183,16 @@ def getConnection(config):
     return (db,cursor)
 
 def getLastProcessed(datadir):
+    qmatch = '\d{4}Q\d{1}.csv'
+    wmatch = '\d{6}.csv'
     allfiles = os.listdir(datadir)
     weekfiles = []
     quarterfiles = []
     for afile in allfiles:
-        fullfile = os.path.join(datadir,afile)
-        if os.path.isdir(fullfile):
-            continue
-        if afile.find('Q') > -1:
+        if re.match(qmatch,afile) is not None:
             quarterfiles.append(afile)
-            continue
-        weekfiles.append(afile)
+        if re.match(wmatch,afile) is not None:
+            weekfiles.append(afile)
     weekfiles.sort()
     quarterfiles.sort()
     if not len(weekfiles):
