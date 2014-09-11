@@ -181,7 +181,7 @@ def createResponsePlot(dataframe,plotdir):
     print 'Saving response.pdf'
     
     
-def main(datafile,plotdir):
+def makePlots(datafile,plotdir):
     dataframe = pd.read_csv(datafile,index_col=False)
     dataframe = filterMissingData(dataframe)
     dataframe = addTimeColumn(dataframe)
@@ -194,5 +194,5 @@ def main(datafile,plotdir):
 if __name__ == '__main__':
     datafile = sys.argv[1]
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    main(datafile,homedir)
+    makePlots(datafile,homedir)
     

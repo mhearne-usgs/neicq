@@ -15,7 +15,7 @@ import neicq
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 DEBUG = False
 
-QUARTERS = {13:'Q1',26:'Q2',39:'Q3',52:'Q4'}
+QUARTERS = {'Q1':(1,13),'Q2':(14,26),'Q3':(27,39),'Q4':(40,52)}
 
 MONSTER_QUERY = '''select /*+ FIRST_ROWS(1) */
  nvl(substr(el.huidevent,1,8), 'NaN')  || ',' EventCode, nvl(substr(el.teventcreated - aoInitial.torigin, 1, 10), 'NaN')  || ',' tDetectLatency,
@@ -184,15 +184,33 @@ def getConnection(config):
 def getLastProcessed(datadir):
     allfiles = os.listdir(datadir)
     weekfiles = []
+    quarterfiles = []
     for afile in allfiles:
         if afile.find('Q') > -1:
+            quarterfiles.append(afile)
             continue
         weekfiles.append(afile)
     weekfiles.sort()
+    quarterfiles.sort()
     if not len(weekfiles):
-        return 190001
-    lastprocessed,ext = os.path.splitext(weekfiles[-1])
-    return int(lastprocessed)
+        lastweek = 190001
+    else:
+        lastweek,ext = os.path.splitext(weekfiles[-1])
+        
+    if not len(quarterfiles):
+        lastquarter = 2013Q4
+    else:
+        lastquarter,ext = os.path.splitext(quarterfiles[-1])
+    
+    return (int(lastweek),lastquarter)
+
+def writeFile(rows,dfile):
+    f = open(dfile,'wt')
+    f.write(header+'\n')
+    for row in rows:
+        rowstr = ''.join(row)
+        f.write(rowstr+'\n')
+    f.close()
 
 def main():
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
@@ -201,32 +219,45 @@ def main():
     config.readfp(open(configfile))
     datadir = config.get('OUTPUT','data')
     plotdir = config.get('OUTPUT','plots')
-    lastprocessed = getLastProcessed(datadir)
+    lastweek,lastquarter = getLastProcessed(datadir)
     db,cursor = getConnection(config)
     pdenumber = getMostRecentPDE(cursor)
 
     header = ','.join(QUERY_COLUMNS)
     
     #weekly check
-    if pdenumber > lastprocessed:
+    if pdenumber > lastweek:
         starttime,endtime = getPDERange(cursor,pdenumber)
         startdate = datetime.utcfromtimestamp(starttime)
         enddate = datetime.utcfromtimestamp(endtime)
         rows = retrieveData(cursor,db,starttime,endtime)
         weekfile = os.path.join(datadir,str(pdenumber)+'.csv')
-        f = open(weekfile,'wt')
-        f.write(header+'\n')
-        for row in rows:
-            rowstr = ''.join(row)
-            f.write(rowstr+'\n')
-        f.close()
+        writeFile(rows,weekfile)
 
         #make weekly plots
         weekdir = os.path.join(plotdir,str(pdenumber))
         if not os.path.isdir(weekdir):
             os.mkdir(weekdir)
-        neicq.main(weekfile,weekdir)
-    
+        neicq.makePlots(weekfile,weekdir)
+
+    #quarterly check
+    for key in QUARTERS.keys.sort():
+        qstart,qend = QUARTERS[key]
+        if qend <= lastquarter:
+            break 
+        starttime,tmp = getPDERange(cursor,qstart)
+        tmp,endtime = getPDERange(cursor,qend)
+        rows = retrieveData(cursor,db,starttime,endtime)
+        quarter = str(datetime.now().year) + key
+        quarterfile = os.path.join(datadir,quarter+'.csv')
+        writeFile(rows,quarterfile)
+
+        #make quarter plots
+        qdir = os.path.join(plotdir,quarter)
+        if not os.path.isdir(qdir):
+            os.mkdir(qdir)
+        neicq.makePlots(quarterfile,qdir)
+        
     cursor.close()
     db.close()
 
