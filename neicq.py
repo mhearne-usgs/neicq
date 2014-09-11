@@ -174,8 +174,8 @@ def createResponsePlot(dataframe,plotdir):
     plt.plot(x,y,'r',linewidth=2,zorder=10)
     s1 = 'Magnitude 5.0, Events = %i' % (len(imag5))
     s2 = 'Magnitude 5.5, Events = %i' % (len(imag55))
-    plt.text(35,85,s1,color='g')
-    plt.text(35,75,s2,color='b')
+    plt.text(35,.85*ymax,s1,color='g')
+    plt.text(35,.75*ymax,s2,color='b')
     plt.savefig(os.path.join(plotdir,'response.pdf'))
     plt.savefig(os.path.join(plotdir,'response.png'))
     print 'Saving response.pdf'
