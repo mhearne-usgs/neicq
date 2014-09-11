@@ -244,7 +244,9 @@ def main():
         neicq.makePlots(weekfile,weekdir)
 
     #quarterly check
-    for key in QUARTERS.keys().sort():
+    qkeys = QUARTERS.keys()
+    qkeys.sort()
+    for key in qkeys:
         qstart,qend = QUARTERS[key]
         if qend <= lastquarter:
             break 
