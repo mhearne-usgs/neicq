@@ -253,8 +253,8 @@ def main():
         qendstr = str(datetime.now().year)+key
         if qendstr <= lastquarter:
             break 
-        starttime,tmp = getPDERange(cursor,qstart)
-        tmp,endtime = getPDERange(cursor,qend)
+        starttime,tmp = getPDERange(cursor,startpde)
+        tmp,endtime = getPDERange(cursor,endpde)
         rows = retrieveData(cursor,db,starttime,endtime)
         quarter = str(datetime.now().year) + key
         quarterfile = os.path.join(datadir,quarter+'.csv')
