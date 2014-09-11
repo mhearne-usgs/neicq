@@ -99,7 +99,7 @@ def createDeltaPlots(dataframe,plotdir):
     dloc = distance.sdist(firstlat,firstlon,lastlat,lastlon)/1000.0
 
     #get the number of 
-    nmag = len((np.abs(dmag) > 1.0).nonzero()[0])
+    nmag = len((np.abs(dmag) > 0.5).nonzero()[0])
     ndepth = len((np.abs(ddepth) > 50).nonzero()[0])
     ndist = len((np.abs(dloc) > 100).nonzero()[0])
 
@@ -218,7 +218,7 @@ def makePlots(datafile,plotdir):
     t2 = dataframe['TORIGINPDE'].as_matrix()
     inan = np.isnan(t1).nonzero()[0]
     t1[inan] = t2[inan]
-    dt = t2-t1
+    dt = np.abs(t2-t1)
     idt = dt < 100
     dataframe = dataframe[idt]
     
