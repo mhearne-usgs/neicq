@@ -248,8 +248,8 @@ def main():
     qkeys.sort()
     for key in qkeys:
         qstart,qend = QUARTERS[key]
-        startpde = str(datetime.now().year) + '%02i' % qstart
-        endpde = str(datetime.now().year) + '%02i' % qend
+        startpde = int(str(datetime.now().year) + '%02i' % qstart)
+        endpde = int(str(datetime.now().year) + '%02i' % qend)
         qendstr = str(datetime.now().year)+key
         if qendstr <= lastquarter:
             break 
