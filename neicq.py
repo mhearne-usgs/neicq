@@ -101,7 +101,8 @@ def createDeltaPlots(dataframe,plotdir):
     #get the number of 
     nmag = len((np.abs(dmag) > 0.5).nonzero()[0])
     ndepth = len((np.abs(ddepth) > 50).nonzero()[0])
-    ndist = len((np.abs(dloc) > 100).nonzero()[0])
+    ndist100 = len((np.abs(dloc) > 100).nonzero()[0])
+    ndist50 = len((np.abs(dloc) > 50).nonzero()[0])
 
     ylabel = '# of earthquakes'
     
@@ -147,7 +148,7 @@ def createDeltaPlots(dataframe,plotdir):
     plt.savefig(os.path.join(plotdir,'changes.png'))
     plt.close()
     print 'Saving changes.pdf'
-    return (nmag,ndepth,ndist)
+    return (nmag,ndepth,ndist100,ndist50)
 
 def createMagHist(dataframe,plotdir):
     lastmag = dataframe['MAGPDE'].as_matrix()
@@ -214,8 +215,8 @@ def makePlots(datafile,plotdir):
     dataframe = addTimeColumn(dataframe)
     
     #remove events where final origin time - initial origin time > 100 seconds
-    t1 = dataframe['TORIGININITIAL'].as_matrix()
-    t2 = dataframe['TORIGINPDE'].as_matrix()
+    t1 = dataframe['TORIGININITIAL'].as_matrix().copy()
+    t2 = dataframe['TORIGINPDE'].as_matrix().copy()
     inan = np.isnan(t1).nonzero()[0]
     t1[inan] = t2[inan]
     dt = np.abs(t2-t1)
@@ -223,16 +224,19 @@ def makePlots(datafile,plotdir):
     dataframe = dataframe[idt]
     
     createSeismicityMap(dataframe,plotdir)
-    nmag,ndepth,ndist = createDeltaPlots(dataframe,plotdir)
+    nmag,ndepth,ndist100,ndist50 = createDeltaPlots(dataframe,plotdir)
     createMagHist(dataframe,plotdir)
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
     statsfile = os.path.join(plotdir,'statistics.txt')
     f = open(statsfile,'wt')
-    f.write('TotalEvents: %i\n' % len(dataframe))
-    f.write('DeltaMag > 0.5: %i Percentage: %.2f%%\n' % (nmag,(float(nmag)/len(dataframe))*100))
-    f.write('DeltaDepth > 50: %i Percentage: %.2f%%\n' % (ndepth,(float(ndepth)/len(dataframe))*100))
-    f.write('DeltaLoc > 100: %i Percentage: %.2f%%\n' % (ndist,(float(ndist)/len(dataframe))*100))
+    ivalid = np.isfinite(dataframe['TORIGININITIAL']).nonzero()[0]
+    nvalid = float(len(ivalid))
+    f.write('TotalEvents: %i\n' % nvalid)
+    f.write('DeltaMag > 0.5: %i out of %i Percentage: %.2f%%\n' % (nmag,nvalid,(nmag/nvalid)*100))
+    f.write('DeltaDepth > 50: %i out of %i Percentage: %.2f%%\n' % (ndepth,nvalid,(ndepth/nvalid)*100))
+    f.write('DeltaLoc > 100: %i out of %i Percentage: %.2f%%\n' % (ndist100,nvalid,(ndist100/nvalid)*100))
+    f.write('DeltaLoc > 50: %i out of %i Percentage: %.2f%%\n' % (ndist50,nvalid,(ndist50/nvalid)*100))
     f.close()
     
 if __name__ == '__main__':
