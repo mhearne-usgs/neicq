@@ -208,6 +208,7 @@ def getLastProcessed(datadir):
     return (int(lastweek),lastquarter)
 
 def writeFile(rows,dfile):
+    header = ','.join(QUERY_COLUMNS)
     f = open(dfile,'wt')
     f.write(header+'\n')
     for row in rows:
@@ -226,7 +227,7 @@ def main():
     db,cursor = getConnection(config)
     pdenumber = getMostRecentPDE(cursor)
 
-    header = ','.join(QUERY_COLUMNS)
+    
     
     #weekly check
     if pdenumber > lastweek:
