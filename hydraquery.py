@@ -186,6 +186,9 @@ def getLastProcessed(datadir):
     weekfiles = []
     quarterfiles = []
     for afile in allfiles:
+        fullfile = os.path.join(datadir,afile)
+        if os.path.isdir(fullfile):
+            continue
         if afile.find('Q') > -1:
             quarterfiles.append(afile)
             continue
