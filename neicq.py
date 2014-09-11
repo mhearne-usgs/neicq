@@ -42,12 +42,9 @@ def createSeismicityMap(dataframe,plotdir):
     lat = dataframe['DLATPDE'].as_matrix()
     lon = dataframe['DLONPDE'].as_matrix()
     mag = dataframe['MAGPDE'].as_matrix()
-    if (max(etimes) - min(etimes)).days > 7:
-        mintimestr = min(etimes).strftime('%b %Y')
-        maxtimestr = max(etimes).strftime('%b %Y')
-    else:
-        mintimestr = min(etimes).strftime('%b %d, %Y')
-        maxtimestr = max(etimes).strftime('%b %d, %Y')
+    
+    mintimestr = min(etimes).strftime('%b %d, %Y')
+    maxtimestr = max(etimes).strftime('%b %d, %Y')
     lon[lon < 0] += 360 #longitudes less than 0 don't get plotted
     try:
         x,y = m(lon,lat) #convert lat/lon data into map coordinates
@@ -104,17 +101,41 @@ def createDeltaPlots(dataframe,plotdir):
     ylabel = '# of earthquakes'
     
     fig,axeslist = plt.subplots(nrows=3,ncols=1)
+    fig.set_size_inches(6,10)
+
+    #mag change histogram
     plt.sca(axeslist[0])
-    plt.hist(dmag,range=(-2.1,2.1),bins=30)
+    dmag[dmag > 1.0] = 1.0
+    dmag[dmag < -1.0] = -1.0
+    drange1 = np.arange(-2.1,2.1,0.1)
+    drange2 = np.arange(-2.0,2.5,0.5)
+    plt.hist(dmag,bins=drange1,align='left')
+    axlim = plt.axis()
+    plt.xticks(drange2)
+    #plt.axis([-1.1,1.1,axlim[2],axlim[3]])
     plt.ylabel(ylabel)
     plt.title('magnitude change (PDE-initial)')
+
+    #depth change histogram
+    ddepth[ddepth > 50] = 50
+    ddepth[ddepth < -50] = -50
     plt.sca(axeslist[1])
-    plt.hist(ddepth,range=(-100,100),bins=30)
+    plt.hist(ddepth,bins=np.arange(-50,50,5),align='left')
+    axlim = plt.axis()
+    plt.axis([-50.0,50.0,axlim[2],axlim[3]])
+    plt.xticks(np.arange(-50,60,10))
     plt.ylabel(ylabel)
     plt.title('depth change [km] (PDE-initial)')
+
+    #location change histogram
+    dloc[dloc > 100] = 100
     plt.sca(axeslist[2])
-    plt.hist(dloc,range=(0,200),bins=30)
+    plt.hist(dloc,bins=np.arange(5,105,5),align='left')
     plt.ylabel(ylabel)
+    axlim = plt.axis()
+    #plt.xticks(np.arange(0,100,20))
+    plt.axis([5,100,axlim[2],axlim[3]])
+    plt.xticks(np.arange(0,120,20))
     plt.title('epicentral change [km]')
     fig.tight_layout()
     plt.savefig(os.path.join(plotdir,'changes.pdf'))

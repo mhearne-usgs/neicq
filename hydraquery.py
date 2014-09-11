@@ -256,10 +256,12 @@ def main():
         endpde = int(str(datetime.now().year) + '%02i' % qend)
         qendstr = str(datetime.now().year)+key
         if qendstr <= lastquarter:
-            break 
-        starttime,tmp = getPDERange(cursor,startpde)
-        tmp,endtime = getPDERange(cursor,endpde)
-        rows = retrieveData(cursor,db,starttime,endtime)
+            break
+        quarterstart,tmp = getPDERange(cursor,startpde)
+        tmp,quarterend = getPDERange(cursor,endpde)
+        if pdenumber < endpde:
+            break
+        rows = retrieveData(cursor,db,quarterstart,quarterend)
         quarter = str(datetime.now().year) + key
         quarterfile = os.path.join(datadir,quarter+'.csv')
         writeFile(rows,quarterfile)
