@@ -152,7 +152,10 @@ def createDeltaPlots(dataframe,plotdir):
 
 def createMagHist(dataframe,plotdir):
     lastmag = dataframe['MAGPDE'].as_matrix()
-    plt.hist(lastmag,bins=64)
+    plt.hist(lastmag,bins=np.arange(0.05,9.55,0.1),alpha=0.4)
+    axlim = plt.axis()
+    plt.axis([0,9.5,axlim[2],axlim[3]])
+    plt.xticks(np.arange(0,10.0,0.5),rotation=-35)
     plt.ylabel('# of earthquakes')
     plt.xlabel('magnitude')
     plt.savefig(os.path.join(plotdir,'maghist.pdf'))
