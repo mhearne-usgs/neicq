@@ -14,6 +14,7 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.stats import mstats
 
 #local imports
 from neicmap import distance
@@ -98,12 +99,18 @@ def createDeltaPlots(dataframe,plotdir):
     ddepth = lastdepth - firstdepth
     dloc = distance.sdist(firstlat,firstlon,lastlat,lastlon)/1000.0
 
-    #get the number of 
+    #get the number of each quantity
     nmag = len((np.abs(dmag) > 0.5).nonzero()[0])
     ndepth = len((np.abs(ddepth) > 50).nonzero()[0])
     ndist100 = len((np.abs(dloc) > 100).nonzero()[0])
     ndist50 = len((np.abs(dloc) > 50).nonzero()[0])
-
+    
+    #get the 90% quantiles for each difference
+    ifinite = np.isfinite(dmag)
+    qmag = mstats.mquantiles(np.abs(dmag[ifinite]),0.9)[0]
+    qdepth = mstats.mquantiles(np.abs(ddepth[ifinite]),0.9)[0]
+    qdist = mstats.mquantiles(np.abs(dloc[ifinite]),0.9)[0]
+    
     ylabel = '# of earthquakes'
     
     fig,axeslist = plt.subplots(nrows=3,ncols=1)
@@ -148,7 +155,7 @@ def createDeltaPlots(dataframe,plotdir):
     plt.savefig(os.path.join(plotdir,'changes.png'))
     plt.close()
     print 'Saving changes.pdf'
-    return (nmag,ndepth,ndist100,ndist50)
+    return (nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist)
 
 def createMagHist(dataframe,plotdir):
     lastmag = dataframe['MAGPDE'].as_matrix()
@@ -227,7 +234,7 @@ def makePlots(datafile,plotdir):
     dataframe = dataframe[idt]
     
     createSeismicityMap(dataframe,plotdir)
-    nmag,ndepth,ndist100,ndist50 = createDeltaPlots(dataframe,plotdir)
+    nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist = createDeltaPlots(dataframe,plotdir)
     createMagHist(dataframe,plotdir)
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
@@ -238,9 +245,12 @@ def makePlots(datafile,plotdir):
     f.write('TotalEvents: %i\n' % len(dataframe))
     f.write('TotalEvents: %i Events with Initial Release information\n' % nvalid)
     f.write('DeltaMag > 0.5: %i out of %i Percentage: %.2f%%\n' % (nmag,nvalid,(nmag/nvalid)*100))
+    f.write('\t90%% of the magnitudes changed by %.1f or less.\n' % qmag)
     f.write('DeltaDepth > 50: %i out of %i Percentage: %.2f%%\n' % (ndepth,nvalid,(ndepth/nvalid)*100))
+    f.write('\t90%% of the depths changed by %.1f km or less.\n' % qdepth)
     f.write('DeltaLoc > 100: %i out of %i Percentage: %.2f%%\n' % (ndist100,nvalid,(ndist100/nvalid)*100))
     f.write('DeltaLoc > 50: %i out of %i Percentage: %.2f%%\n' % (ndist50,nvalid,(ndist50/nvalid)*100))
+    f.write('\t90%% of the epicenters changed by %.1f km or less.\n' % qdist)
     f.close()
     
 if __name__ == '__main__':
