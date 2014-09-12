@@ -239,6 +239,9 @@ def main(pdenumber):
         startdate = datetime.utcfromtimestamp(starttime)
         enddate = datetime.utcfromtimestamp(endtime)
         rows = retrieveData(cursor,db,starttime,endtime)
+        if not len(rows):
+            print 'NO DATA FOUND FOR PDE #%i.  (%s to %s)' % (pdenumber,startdate,enddate)
+            return
         weekfile = os.path.join(datadir,str(pdenumber)+'.csv')
         writeFile(rows,weekfile)
 
