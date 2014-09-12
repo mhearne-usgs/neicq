@@ -232,7 +232,8 @@ def makePlots(datafile,plotdir):
     f = open(statsfile,'wt')
     ivalid = np.isfinite(dataframe['TORIGININITIAL']).nonzero()[0]
     nvalid = float(len(ivalid))
-    f.write('TotalEvents: %i\n' % nvalid)
+    f.write('TotalEvents: %i\n' % len(dataframe))
+    f.write('TotalEvents: %i Events with Initial Release information\n' % nvalid)
     f.write('DeltaMag > 0.5: %i out of %i Percentage: %.2f%%\n' % (nmag,nvalid,(nmag/nvalid)*100))
     f.write('DeltaDepth > 50: %i out of %i Percentage: %.2f%%\n' % (ndepth,nvalid,(ndepth/nvalid)*100))
     f.write('DeltaLoc > 100: %i out of %i Percentage: %.2f%%\n' % (ndist100,nvalid,(ndist100/nvalid)*100))
