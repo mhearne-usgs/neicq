@@ -219,7 +219,7 @@ def writeFile(rows,dfile):
         f.write(rowstr+'\n')
     f.close()
 
-def main():
+def main(pdenumber):
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     configfile = os.path.join(homedir,'config.ini')
     config = ConfigParser.ConfigParser()
@@ -228,9 +228,10 @@ def main():
     plotdir = config.get('OUTPUT','plots')
     lastweek,lastquarter = getLastProcessed(datadir)
     db,cursor = getConnection(config)
-    pdenumber = getMostRecentPDE(cursor)
-
-    
+    if pdenumber is None:
+        pdenumber = getMostRecentPDE(cursor)
+    else:
+        lastweek = 201352
     
     #weekly check
     if pdenumber > lastweek:
@@ -246,6 +247,7 @@ def main():
         if not os.path.isdir(weekdir):
             os.mkdir(weekdir)
         neicq.makePlots(weekfile,weekdir)
+        print 'Finished retrieving/plotting week number %i' % pdenumber
 
     #quarterly check
     qkeys = QUARTERS.keys()
@@ -272,11 +274,16 @@ def main():
             os.mkdir(qdir)
         neicq.makePlots(quarterfile,qdir)
         
+        
     cursor.close()
     db.close()
 
 if __name__ == '__main__':
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    main()
+    if len(sys.argv) > 1:
+        pdenumber = int(sys.argv[1])
+    else:
+        pdenumber = None
+    main(pdenumber)
     sys.exit(0)
     
