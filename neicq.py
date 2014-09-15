@@ -47,10 +47,7 @@ def createSeismicityMap(dataframe,plotdir):
     mintimestr = min(etimes).strftime('%b %d, %Y')
     maxtimestr = max(etimes).strftime('%b %d, %Y')
     lon[lon < 0] += 360 #longitudes less than 0 don't get plotted
-    try:
-        x,y = m(lon,lat) #convert lat/lon data into map coordinates
-    except Exception,msg:
-        pass
+    x,y = m(lon,lat) #convert lat/lon data into map coordinates
 
     i5 = (mag >= 5.0).nonzero()[0]
     i6 = (mag >= 6.0).nonzero()[0]
@@ -249,7 +246,6 @@ def createIncPlot(dataframe,plotdir):
     plt.axis([4,8,np.power(10,0),np.power(10,4)])
     plt.xticks([4,5,6,7,8])
     axlim = plt.axis()
-    print axlim
     plt.legend(['cumulative','incremental','est completeness %.1f' % estcomp,'b=1.0'],numpoints=1)
     plt.xlabel('magnitude',fontsize=18)
     plt.ylabel('number of earthquakes',fontsize=18)
