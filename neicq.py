@@ -217,6 +217,47 @@ def createResponsePlot(dataframe,plotdir):
     plt.savefig(os.path.join(plotdir,'response.pdf'))
     plt.savefig(os.path.join(plotdir,'response.png'))
     print 'Saving response.pdf'
+
+def createIncPlot(dataframe,plotdir):
+    mag = dataframe['MAGPDE'].as_matrix()
+    minmag = np.floor(mag.min())
+    maxmag = np.ceil(mag.max())
+    cdf = []
+    mags = np.arange(minmag,maxmag+0.1,0.1)
+    plt.figure(figsize=(6,6))
+    for cmag in mags:
+        cdf.append(np.sum(mag>=cmag))
+    plt.semilogy(mags,cdf,'k+',markeredgecolor='k',markeredgewidth=1.5)
+    plt.hold(True)
+    [nn,xx] = np.histogram(mag,mags)
+    #xx in python defines the bin edges (length of nn +1), so take the mean of edges to get centers
+    xx = (xx[0:-1] + xx[1:])/2.0
+    plt.semilogy(xx,nn,'ro',markerfacecolor='none',linewidth=1.5,markeredgecolor='r',markeredgewidth=1.5)
+    ii = np.argmax(nn)
+    estcomp = mags[ii]
+    plt.plot([mags[ii],mags[ii]],[1,np.max(plt.axis())])
+
+    #plot lines
+    m1mx = np.arange(1,8.5,0.5)
+    aa = 7.5
+    bb = 1
+    plt.semilogy(m1mx,np.power(10,(aa-bb*m1mx)),'--',linewidth=1,color='b')
+    aa = 7
+    bb = 1
+    plt.semilogy(m1mx,np.power(10,(aa-bb*m1mx)),'-.',linewidth=1,color='b')
+
+    plt.axis([4,8,np.power(10,0),np.power(10,4)])
+    plt.xticks([4,5,6,7,8])
+    axlim = plt.axis()
+    print axlim
+    plt.legend(['cumulative','incremental','est completeness %.1f' % estcomp,'b=1.0'],numpoints=1)
+    plt.xlabel('magnitude',fontsize=18)
+    plt.ylabel('number of earthquakes',fontsize=18)
+
+    plt.savefig(os.path.join(plotdir,'incremental.pdf'))
+    plt.savefig(os.path.join(plotdir,'incremental.png'))
+    print 'Saving incremental.pdf'
+    
     
     
 def makePlots(datafile,plotdir):
@@ -238,6 +279,8 @@ def makePlots(datafile,plotdir):
     createMagHist(dataframe,plotdir)
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
+    createIncPlot(dataframe,plotdir)
+    
     statsfile = os.path.join(plotdir,'statistics.txt')
     f = open(statsfile,'wt')
     ivalid = np.isfinite(dataframe['TORIGININITIAL']).nonzero()[0]
