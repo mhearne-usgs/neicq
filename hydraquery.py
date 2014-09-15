@@ -182,8 +182,13 @@ def getConnection(config):
     password = config.get('DATABASE','password')
     sid = config.get('DATABASE','sid')
     tns = cx_Oracle.makedsn(ip,port,sid)
-    db = cx_Oracle.connect(user,password,tns)
-    cursor = db.cursor()
+    try:
+        db = cx_Oracle.connect(user,password,tns)
+        cursor = db.cursor()
+    except cx_Oracle.DatabaseError, exc:
+        error, = exc.args
+        print "Oracle-Error-Code:", error.code
+        print "Oracle-Error-Message:", error.message
     return (db,cursor)
 
 def getLastProcessed(datadir):
