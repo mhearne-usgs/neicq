@@ -213,6 +213,7 @@ def createResponsePlot(dataframe,plotdir):
     plt.text(35,.75*ymax,s2,color='b')
     plt.savefig(os.path.join(plotdir,'response.pdf'))
     plt.savefig(os.path.join(plotdir,'response.png'))
+    plt.close()
     print 'Saving response.pdf'
 
 def createIncPlot(dataframe,plotdir):
@@ -252,6 +253,7 @@ def createIncPlot(dataframe,plotdir):
 
     plt.savefig(os.path.join(plotdir,'incremental.pdf'))
     plt.savefig(os.path.join(plotdir,'incremental.png'))
+    plt.close()
     print 'Saving incremental.pdf'
     
     
