@@ -261,27 +261,30 @@ def main(pdenumber):
     #quarterly check
     qkeys = QUARTERS.keys()
     qkeys.sort()
-    for key in qkeys:
-        qstart,qend = QUARTERS[key]
-        startpde = int(str(datetime.now().year) + '%02i' % qstart)
-        endpde = int(str(datetime.now().year) + '%02i' % qend)
-        qendstr = str(datetime.now().year)+key
-        if qendstr <= lastquarter:
-            break
-        quarterstart,tmp = getPDERange(cursor,startpde)
-        tmp,quarterend = getPDERange(cursor,endpde)
-        if pdenumber < endpde:
-            break
-        rows = retrieveData(cursor,db,quarterstart,quarterend)
-        quarter = str(datetime.now().year) + key
-        quarterfile = os.path.join(datadir,quarter+'.csv')
-        writeFile(rows,quarterfile)
+    startyear = 2013
+    endyear = str(datetime.utcnow().year)
+    for year in range(startyear,endyear+1):
+        for key in qkeys:
+            qstart,qend = QUARTERS[key]
+            startpde = year + '%02i' % qstart)
+            endpde = year + '%02i' % qend)
+            qendstr = year+key
+            if qendstr <= lastquarter:
+                break
+            quarterstart,tmp = getPDERange(cursor,startpde)
+            tmp,quarterend = getPDERange(cursor,endpde)
+            if pdenumber < endpde:
+                break
+            rows = retrieveData(cursor,db,quarterstart,quarterend)
+            quarter = str(datetime.now().year) + key
+            quarterfile = os.path.join(datadir,quarter+'.csv')
+            writeFile(rows,quarterfile)
 
-        #make quarter plots
-        qdir = os.path.join(plotdir,quarter)
-        if not os.path.isdir(qdir):
-            os.mkdir(qdir)
-        neicq.makePlots(quarterfile,qdir)
+            #make quarter plots
+            qdir = os.path.join(plotdir,quarter)
+            if not os.path.isdir(qdir):
+                os.mkdir(qdir)
+            neicq.makePlots(quarterfile,qdir)
         
         
     cursor.close()
