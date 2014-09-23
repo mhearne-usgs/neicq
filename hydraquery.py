@@ -237,7 +237,7 @@ def main(pdenumber):
     if pdenumber is None:
         pdenumber = getMostRecentPDE(cursor)
     else:
-        lastweek = 201352
+        lastweek = 201252
     
     #weekly check
     if pdenumber > lastweek:
@@ -288,7 +288,6 @@ def main(pdenumber):
     db.close()
 
 if __name__ == '__main__':
-    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     if len(sys.argv) > 1:
         pdenumbers = [int(p) for p in sys.argv[1:]]
         for pdenumber in pdenumbers:

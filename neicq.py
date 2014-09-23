@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.stats import mstats
+from matplotlib.dates import MonthLocator,DateFormatter
 
 #local imports
 from neicmap import distance
@@ -255,8 +256,30 @@ def createIncPlot(dataframe,plotdir):
     plt.savefig(os.path.join(plotdir,'incremental.png'))
     plt.close()
     print 'Saving incremental.pdf'
-    
-    
+
+def createMagTimePlot(dataframe,plotdir):
+    mag = dataframe['MAGPDE'].as_matrix()
+    etime = dataframe['etime'].as_matrix()
+    etimes = []
+    for e in etime:
+        ts = (e - np.datetime64('1970-01-01T00:00:00Z')) / np.timedelta64(1, 's')
+        etimes.append(datetime.utcfromtimestamp(ts))
+        
+    plt.figure(figsize=(12,4))
+    plt.plot(etimes,mag,'o',mfc='none',mec='b')
+    months = MonthLocator(range(1, 13), bymonthday=1, interval=3)
+    monthsFmt = DateFormatter("%b %d")
+    ax = plt.gca()
+    # ax.xaxis.set_major_locator(months)
+    # ax.xaxis.set_major_formatter(monthsFmt)
+    locs,labels = plt.xticks()
+    plt.ylabel('magnitude')
+    #plt.xlabel('month/day')
+
+    plt.savefig(os.path.join(plotdir,'magtime.pdf'))
+    plt.savefig(os.path.join(plotdir,'magtime.png'))
+    plt.close()
+    print 'Saving magtime.pdf'
     
 def makePlots(datafile,plotdir):
     dataframe = pd.read_csv(datafile,index_col=False)
@@ -278,6 +301,7 @@ def makePlots(datafile,plotdir):
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
     createIncPlot(dataframe,plotdir)
+    createMagTimePlot(dataframe,plotdir)
     
     statsfile = os.path.join(plotdir,'statistics.txt')
     f = open(statsfile,'wt')
