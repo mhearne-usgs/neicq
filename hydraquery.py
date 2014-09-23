@@ -282,7 +282,7 @@ def main(pdenumber):
             quarter = str(year) + key
             quarterfile = os.path.join(datadir,quarter+'.csv')
             writeFile(rows,quarterfile)
-
+            print 'Writing data file for %s' % quarter
             #make quarter plots
             qdir = os.path.join(plotdir,quarter)
             if not os.path.isdir(qdir):
