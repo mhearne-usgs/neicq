@@ -210,7 +210,7 @@ def getLastProcessed(datadir):
         lastweek,ext = os.path.splitext(weekfiles[-1])
         
     if not len(quarterfiles):
-        lastquarter = '2013Q4'
+        lastquarter = '2012Q4'
     else:
         lastquarter,ext = os.path.splitext(quarterfiles[-1])
     
