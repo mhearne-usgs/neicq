@@ -262,13 +262,13 @@ def main(pdenumber):
     qkeys = QUARTERS.keys()
     qkeys.sort()
     startyear = 2013
-    endyear = str(datetime.utcnow().year)
+    endyear = datetime.utcnow().year
     for year in range(startyear,endyear+1):
         for key in qkeys:
             qstart,qend = QUARTERS[key]
-            startpde = year + '%02i' % qstart
-            endpde = year + '%02i' % qend
-            qendstr = year+key
+            startpde = str(year) + '%02i' % qstart
+            endpde = str(year) + '%02i' % qend
+            qendstr = str(year)+key
             if qendstr <= lastquarter:
                 break
             quarterstart,tmp = getPDERange(cursor,startpde)
