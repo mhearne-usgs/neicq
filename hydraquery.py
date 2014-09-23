@@ -266,8 +266,8 @@ def main(pdenumber):
     for year in range(startyear,endyear+1):
         for key in qkeys:
             qstart,qend = QUARTERS[key]
-            startpde = year + '%02i' % qstart)
-            endpde = year + '%02i' % qend)
+            startpde = year + '%02i' % qstart
+            endpde = year + '%02i' % qend
             qendstr = year+key
             if qendstr <= lastquarter:
                 break
