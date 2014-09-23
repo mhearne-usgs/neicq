@@ -276,6 +276,9 @@ def main(pdenumber):
             if pdenumber < endpde:
                 break
             rows = retrieveData(cursor,db,quarterstart,quarterend)
+            if not len(rows):
+                print 'No data found for quarter starting at %i' % startpde
+                continue
             quarter = str(datetime.now().year) + key
             quarterfile = os.path.join(datadir,quarter+'.csv')
             writeFile(rows,quarterfile)
