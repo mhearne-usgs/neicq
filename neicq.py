@@ -222,19 +222,20 @@ def createIncPlot(dataframe,plotdir):
     minmag = np.floor(mag.min())
     maxmag = np.ceil(mag.max())
     cdf = []
-    mags = np.arange(minmag,maxmag+0.1,0.1)
+    mags = np.arange(minmag-0.05,maxmag+0.05,0.1)
     plt.figure(figsize=(6,6))
     for cmag in mags:
         cdf.append(np.sum(mag>=cmag))
     plt.semilogy(mags,cdf,'k+',markeredgecolor='k',markeredgewidth=1.5)
     plt.hold(True)
-    [nn,xx] = np.histogram(mag,mags)
+    [nn,xx] = np.histogram(mag,bins=mags)
     #xx in python defines the bin edges (length of nn +1), so take the mean of edges to get centers
     xx = (xx[0:-1] + xx[1:])/2.0
     plt.semilogy(xx,nn,'ro',markerfacecolor='none',linewidth=1.5,markeredgecolor='r',markeredgewidth=1.5)
     ii = np.argmax(nn)
-    estcomp = mags[ii]
-    plt.plot([mags[ii],mags[ii]],[1,np.max(plt.axis())])
+    oldmags = mags+0.05
+    estcomp = round(oldmags[ii]*10)/10
+    plt.plot([estcomp,estcomp],[1,1e6])
 
     #plot lines
     m1mx = np.arange(1,8.5,0.5)
@@ -245,10 +246,12 @@ def createIncPlot(dataframe,plotdir):
     bb = 1
     plt.semilogy(m1mx,np.power(10,(aa-bb*m1mx)),'-.',linewidth=1,color='b')
 
-    plt.axis([4,8,np.power(10,0),np.power(10,4)])
+    pxmax = max(8,maxmag+0.01)
+    
+    plt.axis([4,pxmax,np.power(10,0),np.power(10,4)])
     plt.xticks([4,5,6,7,8])
     axlim = plt.axis()
-    plt.legend(['cumulative','incremental','est completeness %.1f' % estcomp,'b=1.0'],numpoints=1)
+    plt.legend(['cumulative','incremental','est completeness %.1f' % estcomp,'b=1.0','b=1.0'],numpoints=1)
     plt.xlabel('magnitude',fontsize=18)
     plt.ylabel('number of earthquakes',fontsize=18)
 
