@@ -270,7 +270,7 @@ def main(pdenumber):
             endpde = int(str(year) + '%02i' % qend)
             qendstr = str(year)+key
             if qendstr <= lastquarter:
-                break
+                continue
             quarterstart,tmp = getPDERange(cursor,startpde)
             tmp,quarterend = getPDERange(cursor,endpde)
             if pdenumber < endpde:
