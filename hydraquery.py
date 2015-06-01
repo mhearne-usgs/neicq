@@ -228,8 +228,8 @@ QUERY_COLUMNS = ['EVENTCODE','TDETECTLATENCY','TORIGINPDE','MAGPDE','DLATPDE','D
                  'TBECAMERESP','EVENT_DATE_TIME','PREFMAGCURRENT','DLATCURRENT','DLONCURRENT','DDEPTHCURRENT',
                  'TORIGINCURRENT','IUSEDPHCURRENT','TFIRSTGLASS','TORIGINFIRST','MAGFIRST','DLATFIRST','DLONFIRST',
                  'DDEPTHFIRST','TORIGINAUTO','MAGAUTO','DLATAUTO','DLONAUTO','DDEPTHAUTO','TORIGIN10','MAG10',
-                 'DLAT10','DLON10','DDEPTH10','iPDENum','Felt','iQCEventDataQuality','iQCFullPelletCount',
-                 'iQCTimeShift','iQCFullPelletCount','SINSTFIN','SINSTDET','tDetect','dRespMagThresh']
+                 'DLAT10','DLON10','DDEPTH10','iPDENum','Felt','iQCEventDataQuality','iQCTimeShift',
+                 'iQCFullPelletCount','SINSTFIN','GLASS','SINSTDET','tDetect','dRespMagThresh']
 
 def retrieveData(cursor,db,starttime,endtime):
     try:
