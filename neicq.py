@@ -299,7 +299,7 @@ def makePlots(datafile,plotdir):
     nvalid = len(ivalid[0])
     
     createSeismicityMap(dataframe,plotdir)
-    nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist = createDeltaPlots(dataframe[ivalid],plotdir)
+    nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist = createDeltaPlots(dataframe.iloc[ivalid[0],:],plotdir)
     createMagHist(dataframe,plotdir)
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
