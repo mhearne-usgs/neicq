@@ -293,6 +293,7 @@ def makePlots(datafile,plotdir):
     ntot = len(dataframe)
     t1 = dataframe['TBECAMERESP'].as_matrix().copy()
     t2 = dataframe['TORIGINPDE'].as_matrix().copy()
+    t1[t1 == '<NEVER>'] = 9999999
     ivalid = np.where(t1 < (10*60))
     nvalid = len(ivalid)
     
