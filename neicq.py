@@ -290,16 +290,14 @@ def makePlots(datafile,plotdir):
     dataframe = addTimeColumn(dataframe)
     
     #remove events where final origin time - initial origin time > 100 seconds
-    t1 = dataframe['TORIGININITIAL'].as_matrix().copy()
+    ntot = len(dataframe)
+    t1 = dataframe['TBECAMERESP'].as_matrix().copy()
     t2 = dataframe['TORIGINPDE'].as_matrix().copy()
-    inan = np.isnan(t1).nonzero()[0]
-    t1[inan] = t2[inan]
-    dt = np.abs(t2-t1)
-    idt = dt < 100
-    dataframe = dataframe[idt]
+    ivalid = np.where(t1 < (10*60))
+    nvalid = len(ivalid)
     
     createSeismicityMap(dataframe,plotdir)
-    nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist = createDeltaPlots(dataframe,plotdir)
+    nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist = createDeltaPlots(dataframe[ivalid],plotdir)
     createMagHist(dataframe,plotdir)
     createSourceHist(dataframe,plotdir)
     createResponsePlot(dataframe,plotdir)
@@ -308,10 +306,8 @@ def makePlots(datafile,plotdir):
     
     statsfile = os.path.join(plotdir,'statistics.txt')
     f = open(statsfile,'wt')
-    ivalid = np.isfinite(dataframe['TORIGININITIAL']).nonzero()[0]
-    nvalid = float(len(ivalid))
     f.write('TotalEvents: %i\n' % len(dataframe))
-    f.write('TotalEvents: %i Events with Initial Release information\n' % nvalid)
+    f.write('TotalEvents: %i Response Events within 10 minutes\n' % nvalid)
     f.write('DeltaMag > 0.5: %i out of %i Percentage: %.2f%%\n' % (nmag,nvalid,(nmag/nvalid)*100))
     f.write('\t90%% of the magnitudes changed by %.1f or less.\n' % qmag)
     f.write('DeltaDepth > 50: %i out of %i Percentage: %.2f%%\n' % (ndepth,nvalid,(ndepth/nvalid)*100))
