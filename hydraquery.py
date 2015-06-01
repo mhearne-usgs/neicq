@@ -66,7 +66,7 @@ MONSTER_QUERY = '''select /*+ FIRST_ROWS(1) */
 	   nvl(aPOFinal.sInstCode, '<NONE>') || ',' sInstFinalOrigin,
       nvl(decode(case when aoInitial.sNameHR like '%GLASS%' THEN 'GLASS' ELSE 'OTHER' END,'GLASS','GLASS',aoInitial.sInstCode), '<NONE>') || ',' sInstDetect,
 	  nvl(substr(aoInitial.tinserted-p.OT,1,10), 'NaN') || ',' tDetect,
-      p.dRespMagThresh
+      nvl(substr(p.dRespMagThresh,1,3), 'NaN')|| ',' dRespMagThresh,
  from PDEHydra p,
       ALL_ACTUALORIGIN_INFO_WA aoInitial, /* first origin for event in Hydra */
 	  ALL_BHPELLETDESCS InitRel, /* params of first public release */
