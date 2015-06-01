@@ -296,7 +296,7 @@ def makePlots(datafile,plotdir):
     t1[t1 == '<NEVER>'] = 9999999
     t1 = t1.astype(np.float)
     ivalid = np.where(t1 < (10*60))
-    nvalid = len(ivalid)
+    nvalid = len(ivalid[0])
     
     createSeismicityMap(dataframe,plotdir)
     nmag,ndepth,ndist100,ndist50,qmag,qdepth,qdist = createDeltaPlots(dataframe[ivalid],plotdir)
