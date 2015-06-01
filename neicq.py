@@ -294,6 +294,7 @@ def makePlots(datafile,plotdir):
     t1 = dataframe['TBECAMERESP'].as_matrix().copy()
     t2 = dataframe['TORIGINPDE'].as_matrix().copy()
     t1[t1 == '<NEVER>'] = 9999999
+    t1 = t1.astype(np.float)
     ivalid = np.where(t1 < (10*60))
     nvalid = len(ivalid)
     
