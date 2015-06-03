@@ -98,7 +98,7 @@ def createDeltaPlots(dataframe,plotdir):
     dloc = distance.sdist(firstlat,firstlon,lastlat,lastlon)/1000.0
 
     #get the number of each quantity
-    nmag = len((np.abs(dmag) > 0.5).nonzero()[0])
+    nmag = len((np.abs(dmag) >= 0.5).nonzero()[0])
     ndepth = len((np.abs(ddepth) > 50).nonzero()[0])
     ndist100 = len((np.abs(dloc) > 100).nonzero()[0])
     ndist50 = len((np.abs(dloc) > 50).nonzero()[0])
